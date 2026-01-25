@@ -8,13 +8,13 @@ BA-Ackley是一个基于Apache Commons Math实现Ackley函数和蝙蝠算法(Bat
 
 #### `public static double Ackley(ArrayRealVector arrayRealVector)`
 
-计算向量的Ackley函数值。
+计算向量的Ackley函数值。Ackley函数是一个常用的优化问题基准函数，具有许多局部最小值，全局最小值在原点处，用于评估优化算法的性能。
 
 **参数:**
 - `arrayRealVector` - [ArrayRealVector](file://C:\Users\37863\IdeaProjects\BA-Ackley/src/main/java/com/gitee/BA_Ackley/utils/AckleyUtils.java#L15-L33)类型，输入的实数向量
 
 **返回值:**
-- `double`类型，计算得到的Ackley函数值
+- `double`类型，计算得到的Ackley函数值，值越小表示向量越接近原点
 
 **计算公式:**
 ```
@@ -33,7 +33,7 @@ double result = AckleyUtils.Ackley(vector);
 
 #### `public static ArrayRealVector randomRealVector(int n)`
 
-生成指定维度的随机向量，元素值在[0,1)范围内。
+生成指定维度的随机向量，元素值在[0,1)范围内。常用于初始化算法的种群或随机搜索起点。
 
 **参数:**
 - `n` - 向量维度
@@ -48,7 +48,7 @@ ArrayRealVector vector = RealVectorUtils.randomRealVector(5);
 
 #### `public static ArrayRealVector randomRealVector(int n, double min, double max)`
 
-生成指定维度的随机向量，元素值在[min,max)范围内。
+生成指定维度的随机向量，元素值在[min,max)范围内。用于在特定搜索空间内生成随机解。
 
 **参数:**
 - `n` - 向量维度
@@ -65,7 +65,7 @@ ArrayRealVector vector = RealVectorUtils.randomRealVector(5, -5.0, 5.0);
 
 #### `public static ArrayRealVector randomRealVector(int n, double[] min, double[] max)`
 
-生成指定维度的随机向量，每个维度有独立的范围。
+生成指定维度的随机向量，每个维度有独立的范围。用于处理各维度搜索范围不同的优化问题。
 
 **参数:**
 - `n` - 向量维度
@@ -84,7 +84,7 @@ ArrayRealVector vector = RealVectorUtils.randomRealVector(2, min, max);
 
 #### `public static ArrayRealVector randomEpsilon(int n)`
 
-生成指定维度的小随机向量，元素值在[-0.1, 0.1)范围内。
+生成指定维度的小随机向量，元素值在[-0.1, 0.1)范围内。用于在现有解附近生成小幅度扰动，实现局部搜索。
 
 **参数:**
 - `n` - 向量维度
@@ -99,7 +99,7 @@ ArrayRealVector vector = RealVectorUtils.randomEpsilon(3);
 
 #### `public static ArrayRealVector bound(ArrayRealVector arrayRealVector, double[] lb, double[] ub)`
 
-对向量进行边界约束处理。
+对向量进行边界约束处理，确保所有元素都在指定的上下界范围内。防止优化过程中解超出可行域。
 
 **参数:**
 - `arrayRealVector` - 待处理的向量
@@ -118,7 +118,7 @@ ArrayRealVector boundedVector = RealVectorUtils.bound(vector, lowerBounds, upper
 
 #### `public static ArrayRealVector copy(ArrayRealVector arrayRealVector)`
 
-复制向量。
+复制向量，创建一个新的向量实例。用于在算法中保存向量状态，避免意外修改原始数据。
 
 **参数:**
 - `arrayRealVector` - 待复制的向量
@@ -133,7 +133,7 @@ ArrayRealVector copiedVector = RealVectorUtils.copy(originalVector);
 
 #### `public static ArrayRealVector best(ArrayRealVector[] arrayRealVectors)`
 
-从向量数组中找出适应度最高的向量（即Ackley函数值最小的向量）。
+从向量数组中找出适应度最高的向量（即Ackley函数值最小的向量）。用于在优化算法的每一代中找到当前最优解。
 
 **参数:**
 - `arrayRealVectors` - 向量数组
