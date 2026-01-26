@@ -4,6 +4,7 @@ import org.apache.commons.math3.linear.ArrayRealVector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -17,14 +18,20 @@ public class RealVectorUtils {
     static {
         //读取配置文件
         Properties properties = new Properties();
+        FileInputStream fis = null;
         try {
-            properties.load(new FileInputStream(filePath));
+            fis = new FileInputStream(filePath);
+            properties.load(fis);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }finally {
+            log.info("配置文件读取完毕");
+            try {
+                fis.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-        //生成随机数构造器
-        randomSeed = Long.parseLong(properties.getProperty("randomSeed"));
-        random = new Random(randomSeed);
     }
     private RealVectorUtils(){}
 
