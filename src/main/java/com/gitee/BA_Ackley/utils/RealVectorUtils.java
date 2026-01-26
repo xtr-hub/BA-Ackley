@@ -10,7 +10,7 @@ import java.util.Properties;
 import java.util.Random;
 
 public class RealVectorUtils {
-    private static final Logger log = LoggerFactory.getLogger(AckleyUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(RealVectorUtils.class);
     private static final String filePath = "src/main/resources/config/BAConfig.properties";
     private static long randomSeed;//随机数种子，便于复现结果
     private static Random random;//随机数生成器
