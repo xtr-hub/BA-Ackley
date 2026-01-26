@@ -4,7 +4,6 @@ import org.apache.commons.math3.linear.ArrayRealVector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -22,6 +21,8 @@ public class RealVectorUtils {
         try {
             fis = new FileInputStream(filePath);
             properties.load(fis);
+            randomSeed = Long.parseLong(properties.getProperty("randomSeed"));
+            random = new Random(randomSeed);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }finally {
