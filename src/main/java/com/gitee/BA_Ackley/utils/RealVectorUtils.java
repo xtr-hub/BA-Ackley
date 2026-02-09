@@ -21,7 +21,7 @@ public class RealVectorUtils {
         try {
             fis = new FileInputStream(filePath);
             properties.load(fis);
-            randomSeed = Long.parseLong(properties.getProperty("randomSeed"));
+            randomSeed = Long.parseLong(properties.getProperty("ba.random.seed"));
             random = new Random(randomSeed);
         } catch (IOException e) {
             throw new RuntimeException(e);
