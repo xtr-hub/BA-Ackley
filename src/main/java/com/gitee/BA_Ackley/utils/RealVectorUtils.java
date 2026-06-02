@@ -100,13 +100,18 @@ public class RealVectorUtils {
         return best;
     }
 
-    //找出适应度最强的个体(函数式接口)
-    public static<T> T best(T[] objects, Function<T, ArrayRealVector> convertToArrayRealVector){
+    private static<T> ArrayRealVector[] convertToArrayRealVectors(T[] objects, Function<T, ArrayRealVector> convertToArrayRealVector){
         int objectsLen = objects.length;
         ArrayRealVector[] arrayRealVectors = new ArrayRealVector[objectsLen];
         for (int i = 0; i < objectsLen; i++) {
             arrayRealVectors[i] = convertToArrayRealVector.apply(objects[i]);
         }
+        return arrayRealVectors;
+    }
+
+    //找出适应度最强的个体(函数式接口)
+    public static<T> T best(T[] objects, Function<T, ArrayRealVector> convertToArrayRealVector){
+        ArrayRealVector[] arrayRealVectors = convertToArrayRealVectors(objects, convertToArrayRealVector);
         int n = arrayRealVectors.length;
         int bestIndex = 0;
         for (int i = 1; i < n; i++) {
@@ -130,6 +135,22 @@ public class RealVectorUtils {
         }
         log.info("适应度最强的对象：{}",objects[bestIndex]);
         return objects[bestIndex];
+    }
+
+    /**
+     * 边界处理：将超出边界的值限制在合法范围内
+     */
+    public static ArrayRealVector boundPosition(ArrayRealVector position, double lowerBound, double upperBound) {
+        ArrayRealVector bounded = RealVectorUtils.copy(position);
+        for (int i = 0; i < position.getDimension(); i++) {
+            double value = bounded.getEntry(i);
+            if (value < lowerBound) {
+                bounded.setEntry(i, lowerBound);
+            } else if (value > upperBound) {
+                bounded.setEntry(i, upperBound);
+            }
+        }
+        return bounded;
     }
 
 }

@@ -110,7 +110,7 @@ public class main {
                 }
                 
                 // 边界处理
-                newPosition = boundPosition(newPosition);
+                newPosition = RealVectorUtils.boundPosition(newPosition, LOWER_BOUND, UPPER_BOUND);
                 
                 // 计算新位置的适应度值
                 double newFitness = AckleyUtils.Ackley(newPosition);
@@ -188,25 +188,25 @@ public class main {
         return population;
     }
     
-    /**
-     * 找到种群中的全局最优个体
-     */
-    private static batis findGlobalBest(batis[] population) {
-        batis best = population[0];
-        for (int i = 1; i < population.length; i++) {
-            if (population[i].getAckleyValue() < best.getAckleyValue()) {
-                best = population[i];
-            }
-        }
-        // 返回副本，避免引用污染
-        return new batis(
-            RealVectorUtils.copy(best.getAnswer()),
-            RealVectorUtils.copy(best.getSpeed()),
-            best.getLoudness(),
-            best.getPulseRate(),
-            best.getAckleyValue()
-        );
-    }
+    // /**
+    //  * 找到种群中的全局最优个体
+    //  */
+    // private static batis findGlobalBest(batis[] population) {
+    //     batis best = population[0];
+    //     for (int i = 1; i < population.length; i++) {
+    //         if (population[i].getAckleyValue() < best.getAckleyValue()) {
+    //             best = population[i];
+    //         }
+    //     }
+    //     // 返回副本，避免引用污染
+    //     return new batis(
+    //         RealVectorUtils.copy(best.getAnswer()),
+    //         RealVectorUtils.copy(best.getSpeed()),
+    //         best.getLoudness(),
+    //         best.getPulseRate(),
+    //         best.getAckleyValue()
+    //     );
+    // }
     
     /**
      * 计算种群平均响度
@@ -219,19 +219,5 @@ public class main {
         return sum / population.length;
     }
     
-    /**
-     * 边界处理：将超出边界的值限制在合法范围内
-     */
-    private static ArrayRealVector boundPosition(ArrayRealVector position) {
-        ArrayRealVector bounded = RealVectorUtils.copy(position);
-        for (int i = 0; i < position.getDimension(); i++) {
-            double value = bounded.getEntry(i);
-            if (value < LOWER_BOUND) {
-                bounded.setEntry(i, LOWER_BOUND);
-            } else if (value > UPPER_BOUND) {
-                bounded.setEntry(i, UPPER_BOUND);
-            }
-        }
-        return bounded;
-    }
+    
 }
