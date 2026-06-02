@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Random;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class RealVectorUtils {
     private static final Logger log = LoggerFactory.getLogger(RealVectorUtils.class);
@@ -96,6 +98,38 @@ public class RealVectorUtils {
         }
         log.info("适应度最强的向量：{}",best);
         return best;
+    }
+
+    //找出适应度最强的个体(函数式接口)
+    public static<T> T best(T[] objects, Function<T, ArrayRealVector> convertToArrayRealVector){
+        int objectsLen = objects.length;
+        ArrayRealVector[] arrayRealVectors = new ArrayRealVector[objectsLen];
+        for (int i = 0; i < objectsLen; i++) {
+            arrayRealVectors[i] = convertToArrayRealVector.apply(objects[i]);
+        }
+        int n = arrayRealVectors.length;
+        int bestIndex = 0;
+        for (int i = 1; i < n; i++) {
+            //计算Ackley
+            if (AckleyUtils.Ackley(arrayRealVectors[bestIndex]) > AckleyUtils.Ackley(arrayRealVectors[i])){
+                bestIndex = i;
+            }
+        }
+        log.info("适应度最强的向量：{}",arrayRealVectors[bestIndex]);
+        return objects[bestIndex];
+    }
+
+    //找出适应度最强的个体(自定义比较函数为true时最优)
+    public static<T> T best(T[] objects, BiFunction<T, T, Boolean> cmp){
+        int bestIndex = 0;
+        for (int i = 1; i < objects.length; i++) {
+            //计算Ackley
+            if (cmp.apply(objects[bestIndex], objects[i])){
+                bestIndex = i;
+            }
+        }
+        log.info("适应度最强的对象：{}",objects[bestIndex]);
+        return objects[bestIndex];
     }
 
 }
