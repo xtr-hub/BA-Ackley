@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.function.BiFunction;
@@ -14,6 +15,7 @@ import java.util.function.Function;
 public class RealVectorUtils {
     private static final Logger log = LoggerFactory.getLogger(RealVectorUtils.class);
     private static final String filePath = "src/main/resources/config/BAConfig.properties";
+    private static final double DEV = 1e6;//浮点允许的误差
     private static long randomSeed;//随机数种子，便于复现结果
     private static Random random;//随机数生成器
     static {
@@ -135,6 +137,31 @@ public class RealVectorUtils {
         }
         log.info("适应度最强的对象：{}",objects[bestIndex]);
         return objects[bestIndex];
+    }
+
+    public static boolean cmpDouble(double a, double b){
+        return Math.abs(a -  b) < DEV;
+    }
+    
+    //计算汉明距离
+    public static<T> long hammingDistance(T a, T b, Function<T, ArrayRealVector> convertToArrayRealVector){
+        ArrayRealVector aArrayRealVector = convertToArrayRealVector.apply(a);
+        ArrayRealVector bArrayRealVector = convertToArrayRealVector.apply(b);
+        int aSize = aArrayRealVector.getDimension();
+        int bSize = bArrayRealVector.getDimension();
+        if(aSize != bSize) {
+            throw new IllegalArgumentException("计算汉明距离的两个向量维度应该相同");
+        }
+        long ans = 0;
+        for(int i = 0; i < aSize; i++){
+            ans += cmpDouble(aArrayRealVector.getEntry(i) ,bArrayRealVector.getEntry(i)) ? 1 : 0; 
+        }
+        return ans;
+    }
+    
+
+    public static ArrayRealVector encodingROV(ArrayRealVector originArrayRealVector){
+        
     }
 
     /**
