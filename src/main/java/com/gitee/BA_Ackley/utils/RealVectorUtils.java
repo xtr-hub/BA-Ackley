@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
@@ -160,8 +163,23 @@ public class RealVectorUtils {
     }
     
 
+    /**
+     * ROV编码：将实值向量转换为排列向量
+     * 按值从小到大排序，返回对应的索引排列
+     */
     public static ArrayRealVector encodingROV(ArrayRealVector originArrayRealVector){
-        
+        int n = originArrayRealVector.getDimension();
+        ArrayList<Map.Entry<Integer, Double>> entries = new ArrayList<>(n);
+        for(int i = 0; i < n; i++){
+            entries.add(new SimpleEntry<>(i, originArrayRealVector.getEntry(i)));
+        }
+        Collections.sort(entries, Map.Entry.comparingByValue());
+        ArrayRealVector rovVector = new ArrayRealVector(n);
+        for(int rank = 0; rank < n; rank++){
+            rovVector.setEntry(entries.get(rank).getKey(), rank + 1);
+        }
+        log.info("ROV编码后的向量：{}",rovVector);
+        return rovVector;
     }
 
     /**
