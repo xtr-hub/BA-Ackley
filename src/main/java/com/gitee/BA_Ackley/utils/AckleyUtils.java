@@ -18,7 +18,6 @@ public class AckleyUtils {
         double sum2 = 0;//sum(cos(2*pi*xi))
         int n = 0;//向量维度
         n = arrayRealVector.getDimension();
-        log.info("向量维度为：{}",n);
 
         for (int i = 0; i < n; i++) {
             double xi = arrayRealVector.getEntry(i);

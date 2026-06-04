@@ -14,7 +14,7 @@ class XYChartUtilsTest {
 
     @Test
     void XYChartUtilsTest(){
-        chart = XYChartUtils.create("测试图表", "X轴", "Y轴");
+        chart = XYChartUtils.create("测试图表", "X轴", "Y轴", 0, 0);
         XYChartUtils.add(chart, 1, 1);
     }
 }

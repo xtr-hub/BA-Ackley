@@ -21,7 +21,7 @@ public class XYChartUtils {
     /**
      * 创建并显示一个新的 XY 图表。
      */
-    public static XYChart create(String title, String xAxisTitle, String yAxisTitle) {
+    public static XYChart create(String title, String xAxisTitle, String yAxisTitle, double firstX, double firstY) {
         XYChart chart = new XYChartBuilder()
                 .width(800)
                 .height(600)
@@ -33,7 +33,7 @@ public class XYChartUtils {
         log.info("创建二维图表: {}", title);
         
         // 添加空的数据系列，使用包含一个零值的数组以避免Y轴为空的错误
-        chart.addSeries(DEFAULT_SERIES_NAME, new double[]{0.0}, new double[]{0.0});
+        chart.addSeries(DEFAULT_SERIES_NAME, new double[]{firstX}, new double[]{firstY});
         
         // 检查是否处于 headless 模式，如果是则不显示图表窗口
         if (!GraphicsEnvironment.isHeadless()) {
