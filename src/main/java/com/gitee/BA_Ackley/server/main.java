@@ -157,21 +157,26 @@ public class main {
         
         // 迭代优化
         for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
+            // 计算自适应系数G：从1线性递减到0，实现从全局搜索到精细搜索的过渡
+            double G = 1.0 - (double) iteration / MAX_ITERATIONS;
+
             // 遍历每只蝙蝠
             for (int i = 0; i < POP_SIZE; i++) {
                 batis bat = population[i];
-                
+
                 // 生成随机频率 [frequencyMin, frequencyMax]
                 double frequency = frequencyMin + (frequencyMax - frequencyMin) * random.nextDouble();
-                
+
                 // 更新速度：v_i = v_i + (x_i - x_best) * frequency
                 ArrayRealVector velocityUpdate = (ArrayRealVector) globalBest.getAnswer().subtract(bat.getAnswer())
                     .mapMultiply(frequency);
                 ArrayRealVector newVelocity = (ArrayRealVector) bat.getSpeed().add(velocityUpdate);
                 bat.setSpeed(newVelocity);
-                
-                // 更新位置：x_i = x_i + v_i
-                ArrayRealVector newPosition = (ArrayRealVector) bat.getAnswer().add(newVelocity);
+
+                // 更新位置：x_i = x_i + G * v_i（加入自适应系数G）
+                ArrayRealVector newPosition = (ArrayRealVector) bat.getAnswer().add(
+                    newVelocity.mapMultiply(G)
+                );
                 
                 double avgLoudness = initialLoudness;
                 // 局部搜索：如果随机数大于脉冲率，在最优解附近进行随机游走
@@ -183,8 +188,10 @@ public class main {
                     }
                     // 计算平均响度
                     avgLoudness = calculateAverageLoudness(population);
-                    // 在最优解附近随机游走：x_new = x_best + epsilon * avgLoudness
-                    newPosition = (ArrayRealVector) globalBest.getAnswer().add(epsilon.mapMultiply(avgLoudness));
+                    // 在最优解附近随机游走：x_new = x_best + G * epsilon * avgLoudness（加入自适应系数G）
+                    newPosition = (ArrayRealVector) globalBest.getAnswer().add(
+                        epsilon.mapMultiply(avgLoudness).mapMultiply(G)
+                    );
                 }
                 
                 // 边界处理
