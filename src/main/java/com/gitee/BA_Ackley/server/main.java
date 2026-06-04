@@ -89,7 +89,7 @@ public class main {
             elites[i].setOutlierDegree(outlierDegree);
         }
 
-        // 先归一化，再加权组合：score = ackley_norm - weight * outlier_norm
+        // 归一化后直接相减：score = ackley_norm - outlier_norm，无需权重
         // 找到 ackley和outlierDegree的最大最小值用于归一化
         double minAckley = Double.MAX_VALUE;
         double maxAckley = -Double.MAX_VALUE;
@@ -108,7 +108,7 @@ public class main {
         double minScore = Double.MAX_VALUE;
 
         for (batis bat : elites) {
-            // 归一化到 [0, 1]
+            //归一化到 [0, 1]
             double ackleyNorm = (maxAckley > minAckley)
                     ? (bat.getAckleyValue() - minAckley) / (maxAckley - minAckley)
                     : 0.5;
