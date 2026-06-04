@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Properties;
 import java.util.Random;
 
@@ -27,10 +29,11 @@ public class main {
     private static double initialPulseRate;
     private static long randomSeed;
     private static Random random;
+    private static Integer bestSize;//初始精英集合的数量
     
     // 问题参数
     private static final int DIMENSION = 10; // 问题维度
-    private static final int POP_SIZE = 40; // 种群数量
+    private static final int POP_SIZE = 30; // 种群数量
     private static final int MAX_ITERATIONS = 10000; // 最大迭代次数
     private static final double LOWER_BOUND = -32.768; // Ackley函数下界
     private static final double UPPER_BOUND = 32.768; // Ackley函数上界
@@ -54,11 +57,82 @@ public class main {
             initialPulseRate = Double.parseDouble(properties.getProperty("ba.pulse.rate.initial.r0"));
             randomSeed = Long.parseLong(properties.getProperty("ba.random.seed"));
             random = new Random(randomSeed);
+            bestSize = (int) (Float.parseFloat(properties.getProperty("ba.best.size")) * POP_SIZE);
             log.info("配置文件加载成功");
         } catch (IOException e) {
             log.error("配置文件加载失败", e);
             throw new RuntimeException(e);
         }
+    }
+
+    //全新的选择精英逻辑，基于适应度排序并返回最优个体的副本
+    public static batis findBest(batis[] population){
+        //按 ackleyValue从小到大排序
+        Arrays.sort(population, Comparator.comparingDouble(b -> b.getAckleyValue()));
+
+        //取前bestSize个作为候选精英
+        int eliteSize = Math.min(bestSize, population.length);
+        batis[] elites = Arrays.copyOf(population, eliteSize);
+
+        //对每个精英计算离群度：与其他所有精英的欧氏距离均值
+        for (int i = 0; i < elites.length; i++) {
+            double totalDistance = 0.0;
+            int count = 0;
+            for (int j = 0; j < elites.length; j++) {
+                if (i != j) {
+                    totalDistance += RealVectorUtils.euclideanDistance(elites[i], elites[j], batis::getAnswer);
+                    count++;
+                }
+            }
+            //计算平均离群度，避免除零
+            double outlierDegree = (count > 0) ? totalDistance / count : 1.0;
+            elites[i].setOutlierDegree(outlierDegree);
+        }
+
+        // 先归一化，再加权组合：score = ackley_norm - weight * outlier_norm
+        // 找到 ackley和outlierDegree的最大最小值用于归一化
+        double minAckley = Double.MAX_VALUE;
+        double maxAckley = -Double.MAX_VALUE;
+        double minOutlier = Double.MAX_VALUE;
+        double maxOutlier = -Double.MAX_VALUE;
+
+        for (batis bat : elites) {
+            minAckley = Math.min(minAckley, bat.getAckleyValue());
+            maxAckley = Math.max(maxAckley, bat.getAckleyValue());
+            minOutlier = Math.min(minOutlier, bat.getOutlierDegree());
+            maxOutlier = Math.max(maxOutlier, bat.getOutlierDegree());
+        }
+
+        //归一化后直接相减，找最小的
+        batis bestBat = elites[0];
+        double minScore = Double.MAX_VALUE;
+
+        for (batis bat : elites) {
+            // 归一化到 [0, 1]
+            double ackleyNorm = (maxAckley > minAckley)
+                    ? (bat.getAckleyValue() - minAckley) / (maxAckley - minAckley)
+                    : 0.5;
+            double outlierNorm = (maxOutlier > minOutlier)
+                    ? (bat.getOutlierDegree() - minOutlier) / (maxOutlier - minOutlier)
+                    : 0.5;
+
+            double score = ackleyNorm - outlierNorm;
+
+            if (score < minScore) {
+                minScore = score;
+                bestBat = bat;
+            }
+        }
+
+        // 返回副本避免引用污染
+        return new batis(
+            RealVectorUtils.copy(bestBat.getAnswer()),
+            RealVectorUtils.copy(bestBat.getSpeed()),
+            bestBat.getLoudness(),
+            bestBat.getPulseRate(),
+            bestBat.getAckleyValue(),
+            bestBat.getOutlierDegree()
+        );
     }
     
     public static void main(String[] args) {
@@ -77,8 +151,8 @@ public class main {
         batis[] population = initializePopulation();
         
         // 找到初始最优解
-        //batis globalBest = findGlobalBest(population);
-        batis globalBest = RealVectorUtils.best(population, (a, b) -> a.getAckleyValue() < b.getAckleyValue());
+        // batis globalBest = findGlobalBest(population);
+        batis globalBest = findBest(population);
         log.info("初始最优适应度值: {}", globalBest.getAckleyValue());
         
         // 迭代优化
@@ -99,12 +173,16 @@ public class main {
                 // 更新位置：x_i = x_i + v_i
                 ArrayRealVector newPosition = (ArrayRealVector) bat.getAnswer().add(newVelocity);
                 
+                double avgLoudness = initialLoudness;
                 // 局部搜索：如果随机数大于脉冲率，在最优解附近进行随机游走
                 if (random.nextDouble() > bat.getPulseRate()) {
-                    // 生成局部扰动 epsilon ∈ [-0.1, 0.1]
-                    ArrayRealVector epsilon = RealVectorUtils.randomEpsilon(DIMENSION);
+                    // 生成局部扰动 epsilon ∈ [-5.0, 5.0]（增大范围，帮助跳出局部最优）
+                    ArrayRealVector epsilon = new ArrayRealVector(DIMENSION);
+                    for (int d = 0; d < DIMENSION; d++) {
+                        epsilon.setEntry(d, random.nextDouble() * 10.0 - 5.0);
+                    }
                     // 计算平均响度
-                    double avgLoudness = calculateAverageLoudness(population);
+                    avgLoudness = calculateAverageLoudness(population);
                     // 在最优解附近随机游走：x_new = x_best + epsilon * avgLoudness
                     newPosition = (ArrayRealVector) globalBest.getAnswer().add(epsilon.mapMultiply(avgLoudness));
                 }
@@ -125,17 +203,21 @@ public class main {
                     bat.setPulseRate(initialPulseRate * (1 - Math.exp(-pulseRateGamma * iteration)));
                 }
                 
-                // 更新全局最优解
-                if (bat.getAckleyValue() < globalBest.getAckleyValue()) {
-                    globalBest.setAnswer(RealVectorUtils.copy(bat.getAnswer()));
-                    globalBest.setAckleyValue(bat.getAckleyValue());
-                    globalBest.setSpeed(RealVectorUtils.copy(bat.getSpeed()));
-                    globalBest.setLoudness(bat.getLoudness());
-                    globalBest.setPulseRate(bat.getPulseRate());
-                    log.info("第{}次迭代找到更优解，适应度值: {}", iteration + 1, globalBest.getAckleyValue());
-                }
+                // 更新种群个数
+                bestSize = (int) (bestSize * (avgLoudness / initialLoudness));
+                // 设置上下限：最小 1，最大种群的 50%
+                int minBestSize = 1;
+                int maxBestSize = Math.max(1, POP_SIZE / 2);
+                bestSize = Math.max(minBestSize, Math.min(maxBestSize, bestSize));
             }
-            
+
+            // 每轮迭代结束后，使用 findBest 更新全局最优解（直接接受，兼顾多样性）
+            batis newGlobalBest = findBest(population);
+            if (newGlobalBest.getAckleyValue() < globalBest.getAckleyValue()) {
+                log.info("第{}次迭代找到更优解，适应度值: {}", iteration + 1, newGlobalBest.getAckleyValue());
+            }
+            globalBest = newGlobalBest;
+
             // 每10次迭代记录一次到图表
             if ((iteration + 1) % 10 == 0) {
                 XYChartUtils.add(chart, iteration + 1, globalBest.getAckleyValue());
@@ -153,6 +235,11 @@ public class main {
         log.info("优化精度: {}", Math.abs(globalBest.getAckleyValue() - 0.0));
     }
     
+    // 更新精英个体数,计算响度平均值（占位实现，当前保持不变）
+    private static Integer updateBestSize(Integer bestSize) {
+        return bestSize;
+    }
+
     /**
      * 初始化蝙蝠种群
      */

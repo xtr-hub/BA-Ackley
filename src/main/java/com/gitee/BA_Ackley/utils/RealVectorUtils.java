@@ -157,9 +157,26 @@ public class RealVectorUtils {
         }
         long ans = 0;
         for(int i = 0; i < aSize; i++){
-            ans += cmpDouble(aArrayRealVector.getEntry(i) ,bArrayRealVector.getEntry(i)) ? 1 : 0; 
+            ans += cmpDouble(aArrayRealVector.getEntry(i) ,bArrayRealVector.getEntry(i)) ? 1 : 0;
         }
         return ans;
+    }
+
+    //计算欧氏距离
+    public static<T> double euclideanDistance(T a, T b, Function<T, ArrayRealVector> convertToArrayRealVector){
+        ArrayRealVector aArrayRealVector = convertToArrayRealVector.apply(a);
+        ArrayRealVector bArrayRealVector = convertToArrayRealVector.apply(b);
+        int aSize = aArrayRealVector.getDimension();
+        int bSize = bArrayRealVector.getDimension();
+        if(aSize != bSize) {
+            throw new IllegalArgumentException("计算欧氏距离的两个向量维度应该相同");
+        }
+        double sum = 0.0;
+        for(int i = 0; i < aSize; i++){
+            double diff = aArrayRealVector.getEntry(i) - bArrayRealVector.getEntry(i);
+            sum += diff * diff;
+        }
+        return Math.sqrt(sum);
     }
     
 

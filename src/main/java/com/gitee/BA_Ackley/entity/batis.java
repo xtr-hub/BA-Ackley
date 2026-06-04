@@ -14,6 +14,8 @@ public class batis {
     private double pulseRate;
     //适应度，也就是ackley函数的值
     private double ackleyValue;
+    //离群度：与其他所有蝙蝠的汉明距离均值
+    private double outlierDegree;
 
     public batis() {
     }
@@ -24,6 +26,16 @@ public class batis {
         this.loudness = loudness;
         this.pulseRate = pulseRate;
         this.ackleyValue = ackleyValue;
+        this.outlierDegree = 0.0;
+    }
+
+    public batis(ArrayRealVector answer, ArrayRealVector speed, double loudness, double pulseRate, double ackleyValue, double outlierDegree) {
+        this.answer = answer;
+        this.speed = speed;
+        this.loudness = loudness;
+        this.pulseRate = pulseRate;
+        this.ackleyValue = ackleyValue;
+        this.outlierDegree = outlierDegree;
     }
 
     /**
@@ -106,8 +118,24 @@ public class batis {
         this.ackleyValue = ackleyValue;
     }
 
+    /**
+     * 获取
+     * @return outlierDegree
+     */
+    public double getOutlierDegree() {
+        return outlierDegree;
+    }
+
+    /**
+     * 设置
+     * @param outlierDegree
+     */
+    public void setOutlierDegree(double outlierDegree) {
+        this.outlierDegree = outlierDegree;
+    }
+
     public String toString() {
-        return "batis{answer = " + answer + ", speed = " + speed + ", loudness = " + loudness + ", pulseRate = " + pulseRate + ", ackleyValue = " + ackleyValue + "}";
+        return "batis{answer = " + answer + ", speed = " + speed + ", loudness = " + loudness + ", pulseRate = " + pulseRate + ", ackleyValue = " + ackleyValue + ", outlierDegree = " + outlierDegree + "}";
     }
 }
 
