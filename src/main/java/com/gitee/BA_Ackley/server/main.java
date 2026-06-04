@@ -33,8 +33,8 @@ public class main {
     
     // 问题参数
     private static final int DIMENSION = 10; // 问题维度
-    private static final int POP_SIZE = 30; // 种群数量
-    private static final int MAX_ITERATIONS = 10000; // 最大迭代次数
+    private static final int POP_SIZE = 300; // 种群数量
+    private static final int MAX_ITERATIONS = 1000; // 最大迭代次数
     private static final double LOWER_BOUND = -32.768; // Ackley函数下界
     private static final double UPPER_BOUND = 32.768; // Ackley函数上界
     
@@ -157,8 +157,8 @@ public class main {
         
         // 迭代优化
         for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
-            // 计算自适应系数G：从1线性递减到0，实现从全局搜索到精细搜索的过渡
-            double G = 1.0 - (double) iteration / MAX_ITERATIONS;
+            //计算自适应系数G
+            double G = Math.sqrt(1.0 - (double) iteration / MAX_ITERATIONS);
 
             // 遍历每只蝙蝠
             for (int i = 0; i < POP_SIZE; i++) {
@@ -218,7 +218,7 @@ public class main {
                 bestSize = Math.max(minBestSize, Math.min(maxBestSize, bestSize));
             }
 
-            // 每轮迭代结束后，使用 findBest 更新全局最优解（直接接受，兼顾多样性）
+            // 每轮迭代结束后，使用 findBest 更新全局最优解
             batis newGlobalBest = findBest(population);
             if (newGlobalBest.getAckleyValue() < globalBest.getAckleyValue()) {
                 log.info("第{}次迭代找到更优解，适应度值: {}", iteration + 1, newGlobalBest.getAckleyValue());
