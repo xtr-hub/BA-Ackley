@@ -35,7 +35,7 @@ public class main {
     // 问题参数
     private static final int DIMENSION = 10; //问题维度
     private static final int POP_SIZE = 80; //种群数量
-    private static final int MAX_ITERATIONS = 1000; //最大迭代次数
+    private static final int MAX_ITERATIONS = 500; //最大迭代次数
     private static final double LOWER_BOUND = -32.768; //Ackley函数下界
     private static final double UPPER_BOUND = 32.768; //Ackley函数上界
 
@@ -66,7 +66,7 @@ public class main {
         }
     }
 
-    //全新的选择精英逻辑,基于适应度排序并返回最优个体的副本
+    //新的选择精英逻辑,基于适应度排序并返回最优个体的副本
     public static Batis findBest(Batis[] population) {
         //按 ackleyValue从小到大排序
         Arrays.sort(population, Comparator.comparingDouble(b -> b.getAckleyValue()));
