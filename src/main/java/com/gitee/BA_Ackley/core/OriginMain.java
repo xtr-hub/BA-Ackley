@@ -1,4 +1,4 @@
-package com.gitee.BA_Ackley.server;
+package com.gitee.BA_Ackley.core;
 
 import com.gitee.BA_Ackley.entity.Batis;
 import com.gitee.BA_Ackley.utils.AckleyUtils;
