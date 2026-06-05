@@ -1,6 +1,6 @@
 package com.gitee.BA_Ackley.server;
 
-import com.gitee.BA_Ackley.entity.batis;
+import com.gitee.BA_Ackley.entity.Batis;
 import com.gitee.BA_Ackley.utils.AckleyUtils;
 import com.gitee.BA_Ackley.utils.RealVectorUtils;
 import com.gitee.BA_Ackley.utils.XYChartUtils;
@@ -67,13 +67,13 @@ public class main {
     }
 
     //全新的选择精英逻辑,基于适应度排序并返回最优个体的副本
-    public static batis findBest(batis[] population) {
+    public static Batis findBest(Batis[] population) {
         //按 ackleyValue从小到大排序
         Arrays.sort(population, Comparator.comparingDouble(b -> b.getAckleyValue()));
 
         //取前bestSize个作为候选精英
         int eliteSize = Math.min(bestSize, population.length);
-        batis[] elites = Arrays.copyOf(population, eliteSize);
+        Batis[] elites = Arrays.copyOf(population, eliteSize);
 
         //对每个精英计算离群度,与其他所有精英的欧氏距离均值
         for (int i = 0; i < elites.length; i++) {
@@ -81,7 +81,7 @@ public class main {
             int count = 0;
             for (int j = 0; j < elites.length; j++) {
                 if (i != j) {
-                    totalDistance += RealVectorUtils.euclideanDistance(elites[i], elites[j], batis::getAnswer);
+                    totalDistance += RealVectorUtils.euclideanDistance(elites[i], elites[j], Batis::getAnswer);
                     count++;
                 }
             }
@@ -97,7 +97,7 @@ public class main {
         double minOutlier = Double.MAX_VALUE;
         double maxOutlier = -Double.MAX_VALUE;
 
-        for (batis bat : elites) {
+        for (Batis bat : elites) {
             minAckley = Math.min(minAckley, bat.getAckleyValue());
             maxAckley = Math.max(maxAckley, bat.getAckleyValue());
             minOutlier = Math.min(minOutlier, bat.getOutlierDegree());
@@ -105,10 +105,10 @@ public class main {
         }
 
         //归一化后直接相减,找最小的
-        batis bestBat = elites[0];
+        Batis bestBat = elites[0];
         double minScore = Double.MAX_VALUE;
 
-        for (batis bat : elites) {
+        for (Batis bat : elites) {
             //归一化到
             double ackleyNorm = (maxAckley > minAckley)
                     ? (bat.getAckleyValue() - minAckley) / (maxAckley - minAckley)
@@ -126,7 +126,7 @@ public class main {
         }
 
         //返回副本避免引用污染
-        return new batis(
+        return new Batis(
                 RealVectorUtils.copy(bestBat.getAnswer()),
                 RealVectorUtils.copy(bestBat.getSpeed()),
                 bestBat.getLoudness(),
@@ -140,11 +140,11 @@ public class main {
         log.info("搜索空间: [{}, {}]", LOWER_BOUND, UPPER_BOUND);
 
         //初始化蝙蝠种群
-        batis[] population = initializePopulation();
+        Batis[] population = initializePopulation();
 
         //找到初始最优解
         //batis globalBest = findGlobalBest(population);
-        batis globalBest = findBest(population);
+        Batis globalBest = findBest(population);
         log.info("初始最优适应度值: {}", globalBest.getAckleyValue());
 
         //迭代优化
@@ -154,7 +154,7 @@ public class main {
 
             //遍历每只蝙蝠
             for (int i = 0; i < POP_SIZE; i++) {
-                batis bat = population[i];
+                Batis bat = population[i];
 
                 //生成随机频率
                 double frequency = frequencyMin + (frequencyMax - frequencyMin) * random.nextDouble();
@@ -209,7 +209,7 @@ public class main {
             }
 
             //每轮迭代结束后,使用 findBest 更新全局最优解
-            batis newGlobalBest = findBest(population);
+            Batis newGlobalBest = findBest(population);
             if (newGlobalBest.getAckleyValue() < globalBest.getAckleyValue()) {
                 log.info("第{}次迭代找到更优解，适应度值: {}", iteration + 1, newGlobalBest.getAckleyValue());
             }
@@ -240,17 +240,12 @@ public class main {
         log.info("优化精度: {}", Math.abs(globalBest.getAckleyValue() - 0.0));
     }
 
-    //更新精英个体数,计算响度平均值
-    private static Integer updateBestSize(Integer bestSize) {
-        return bestSize;
-    }
-
     /**
      * 初始化蝙蝠种群
      */
-    private static batis[] initializePopulation() {
+    private static Batis[] initializePopulation() {
         log.info("正在初始化种群...");
-        batis[] population = new batis[POP_SIZE];
+        Batis[] population = new Batis[POP_SIZE];
 
         for (int i = 0; i < POP_SIZE; i++) {
             //随机初始化位置
@@ -265,7 +260,7 @@ public class main {
             double fitness = AckleyUtils.Ackley(position);
 
             //创建蝙蝠个体
-            population[i] = new batis(
+            population[i] = new Batis(
                     position,
                     velocity,
                     initialLoudness,
@@ -300,9 +295,9 @@ public class main {
     /**
      * 计算种群平均响度
      */
-    private static double calculateAverageLoudness(batis[] population) {
+    private static double calculateAverageLoudness(Batis[] population) {
         double sum = 0.0;
-        for (batis bat : population) {
+        for (Batis bat : population) {
             sum += bat.getLoudness();
         }
         return sum / population.length;

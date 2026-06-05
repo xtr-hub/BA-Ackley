@@ -3,7 +3,7 @@ package com.gitee.BA_Ackley.entity;
 import org.apache.commons.math3.linear.ArrayRealVector;
 
 //蝙蝠类
-public class batis {
+public class Batis {
     //每个蝙蝠对应的答案
     private ArrayRealVector answer;
     //速度
@@ -17,10 +17,10 @@ public class batis {
     //离群度：与其他所有蝙蝠的汉明距离均值
     private double outlierDegree;
 
-    public batis() {
+    public Batis() {
     }
 
-    public batis(ArrayRealVector answer, ArrayRealVector speed, double loudness, double pulseRate, double ackleyValue) {
+    public Batis(ArrayRealVector answer, ArrayRealVector speed, double loudness, double pulseRate, double ackleyValue) {
         this.answer = answer;
         this.speed = speed;
         this.loudness = loudness;
@@ -29,7 +29,7 @@ public class batis {
         this.outlierDegree = 0.0;
     }
 
-    public batis(ArrayRealVector answer, ArrayRealVector speed, double loudness, double pulseRate, double ackleyValue, double outlierDegree) {
+    public Batis(ArrayRealVector answer, ArrayRealVector speed, double loudness, double pulseRate, double ackleyValue, double outlierDegree) {
         this.answer = answer;
         this.speed = speed;
         this.loudness = loudness;
