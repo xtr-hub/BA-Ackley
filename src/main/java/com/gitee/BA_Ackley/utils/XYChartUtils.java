@@ -88,4 +88,55 @@ public class XYChartUtils {
             log.error("添加数据点失败: ({}, {})", x, y, e);
         }
     }
+
+    /**
+     * 向图表添加一个新的数据系列
+     */
+    public static void addSeries(XYChart chart, String seriesName, double firstX, double firstY) {
+        chart.addSeries(seriesName, new double[]{firstX}, new double[]{firstY});
+    }
+
+    /**
+     * 向指定数据系列追加一个数据点
+     */
+    public static void add(XYChart chart, String seriesName, double x, double y) {
+        if (chart == null) {
+            log.error("图表对象不能为null");
+            return;
+        }
+
+        XYSeries series = chart.getSeriesMap().get(seriesName);
+        if (series == null) {
+            log.error("未找到数据系列: {}", seriesName);
+            return;
+        }
+
+        try {
+            if (!methodChecked) {
+                try {
+                    addMethod = XYSeries.class.getMethod("addData", double.class, double.class);
+                    methodChecked = true;
+                } catch (NoSuchMethodException e) {
+                    log.warn("XYSeries.addData方法不存在，尝试使用updateXYSeries方法");
+                    methodChecked = true;
+                }
+            }
+
+            if (addMethod != null) {
+                addMethod.invoke(series, x, y);
+            } else {
+                double[] xData = series.getXData();
+                double[] yData = series.getYData();
+                double[] newXData = new double[xData.length + 1];
+                double[] newYData = new double[yData.length + 1];
+                System.arraycopy(xData, 0, newXData, 0, xData.length);
+                System.arraycopy(yData, 0, newYData, 0, yData.length);
+                newXData[xData.length] = x;
+                newYData[yData.length] = y;
+                chart.updateXYSeries(seriesName, newXData, newYData, null);
+            }
+        } catch (Exception e) {
+            log.error("添加数据点失败: ({}, {})", x, y, e);
+        }
+    }
 }

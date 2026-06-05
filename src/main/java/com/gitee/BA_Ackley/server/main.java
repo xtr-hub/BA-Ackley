@@ -143,9 +143,16 @@ public class main {
         Batis[] population = initializePopulation();
 
         //找到初始最优解
-        //batis globalBest = findGlobalBest(population);
         Batis globalBest = findBest(population);
         log.info("初始最优适应度值: {}", globalBest.getAckleyValue());
+
+        // 创建图表，记录初始值
+        chart = XYChartUtils.create(
+                "蝙蝠算法优化Ackley函数对比",
+                "迭代次数",
+                "最优适应度值",
+                0,
+                globalBest.getAckleyValue());
 
         //迭代优化
         for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
@@ -217,19 +224,13 @@ public class main {
 
             //每10次迭代记录一次到图表
             if ((iteration + 1) % 10 == 0) {
-                if (iteration == 9) {
-                    //创建图表用于可视化优化过程
-                    chart = XYChartUtils.create(
-                            "蝙蝠算法优化Ackley函数",
-                            "迭代次数",
-                            "最优适应度值", iteration + 1, globalBest.getAckleyValue());
-                }
-                if (chart != null) {
-                    XYChartUtils.add(chart, iteration + 1, globalBest.getAckleyValue());
-                    log.info("第{}次迭代，当前最优适应度值: {}", iteration + 1, globalBest.getAckleyValue());
-                }
+                XYChartUtils.add(chart, iteration + 1, globalBest.getAckleyValue());
+                log.info("第{}次迭代，当前最优适应度值: {}", iteration + 1, globalBest.getAckleyValue());
             }
         }
+
+        // 在同一张图上绘制原始算法
+        OriginMain.run(chart);
 
         //输出最终结果
         log.info("最优适应度值: {}", globalBest.getAckleyValue());

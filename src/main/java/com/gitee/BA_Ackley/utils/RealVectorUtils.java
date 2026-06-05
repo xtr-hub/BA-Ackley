@@ -61,6 +61,14 @@ public class RealVectorUtils {
         return arrayRealVector;
     }
 
+    public static ArrayRealVector randomRealVector(Random random, int n, double min, double max){
+        ArrayRealVector arrayRealVector = new ArrayRealVector(n);
+        for (int i = 0; i < n; i++) {
+            arrayRealVector.setEntry(i, random.nextDouble() * (max - min) + min);
+        }
+        return arrayRealVector;
+    }
+
     public static ArrayRealVector randomRealVector(int n,double[] min,double[] max){
         ArrayRealVector arrayRealVector = new ArrayRealVector(n);
         for (int i = 0; i < n; i++) {
