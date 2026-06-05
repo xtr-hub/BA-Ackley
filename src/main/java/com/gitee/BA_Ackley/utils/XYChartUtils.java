@@ -30,7 +30,7 @@ public class XYChartUtils {
                 .yAxisTitle(yAxisTitle)
                 .build();
 
-        log.info("创建二维图表: {}", title);
+        //log.info("创建二维图表: {}", title);
         
         // 添加空的数据系列，使用包含一个零值的数组以避免Y轴为空的错误
         chart.addSeries(DEFAULT_SERIES_NAME, new double[]{firstX}, new double[]{firstY});
@@ -83,7 +83,7 @@ public class XYChartUtils {
                 chart.updateXYSeries(DEFAULT_SERIES_NAME, newXData, newYData, null);
             }
 
-            log.debug("添加数据点: ({}, {})", x, y);
+            //log.debug("添加数据点: ({}, {})", x, y);
         } catch (Exception e) {
             log.error("添加数据点失败: ({}, {})", x, y, e);
         }

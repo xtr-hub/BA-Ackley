@@ -136,7 +136,6 @@ public class main {
     }
 
     public static void main(String[] args) {
-        log.info("========== 蝙蝠算法优化Ackley函数开始 ==========");
         log.info("问题维度: {}, 种群大小: {}, 最大迭代次数: {}", DIMENSION, POP_SIZE, MAX_ITERATIONS);
         log.info("搜索空间: [{}, {}]", LOWER_BOUND, UPPER_BOUND);
 
@@ -233,7 +232,6 @@ public class main {
         }
 
         //输出最终结果
-        log.info("========== 优化完成 ==========");
         log.info("最优适应度值: {}", globalBest.getAckleyValue());
         log.info("最优解向量: {}", globalBest.getAnswer());
 
