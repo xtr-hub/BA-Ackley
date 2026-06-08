@@ -74,7 +74,10 @@ public class OriginMain {
 
                 // 局部搜索
                 if (random.nextDouble() > bat.getPulseRate()) {
-                    ArrayRealVector epsilon = RealVectorUtils.randomEpsilon(DIMENSION);
+                    ArrayRealVector epsilon = new ArrayRealVector(DIMENSION);
+                    for (int d = 0; d < DIMENSION; d++) {
+                        epsilon.setEntry(d, random.nextDouble() * 10.0 - 5.0);
+                    }
                     double avgLoudness = calculateAverageLoudness(population);
                     newPosition = (ArrayRealVector) globalBest.getAnswer().add(epsilon.mapMultiply(avgLoudness));
                 }

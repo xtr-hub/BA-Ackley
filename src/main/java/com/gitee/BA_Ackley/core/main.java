@@ -146,7 +146,7 @@ public class main {
         Batis globalBest = findBest(population);
         log.info("初始最优适应度值: {}", globalBest.getAckleyValue());
 
-        // 创建图表，记录初始值
+        //创建图表，记录初始值
         chart = XYChartUtils.create(
                 "蝙蝠算法优化Ackley函数对比",
                 "迭代次数",
