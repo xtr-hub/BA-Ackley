@@ -27,7 +27,6 @@ BA-Ackley是一个基于Apache Commons Math实现Ackley函数和蝙蝠算法(Bat
 | 精英选择 | `findBest()` 归一化评分（适应度 + 离群度） | `findGlobalBest()` 简单贪心 |
 | 离群度计算 | 欧氏距离均值 | 无 |
 | bestSize | 动态调整（随响度衰减，有上下限） | 无 |
-| 局部搜索扰动 | `[-5.0, 5.0]` | `[-0.1, 0.1]` |
 | 图表系列名 | "Default Series" | "原始蝙蝠算法" |
 
 ## API文档
